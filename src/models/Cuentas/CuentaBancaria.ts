@@ -4,7 +4,7 @@ import { ICuenta } from './Cuenta';
 export interface ICuentaBancaria extends Document {
     // nombre: string;
     // monto: number;
-    noCuenta: number;
+    noCuenta: string;
     banco: string;
     cuenta: ICuenta['_id'];
 }
@@ -12,7 +12,7 @@ export interface ICuentaBancaria extends Document {
 const AcountSchema: Schema = new Schema({
     // nombre: { type: String, required: true },
     // monto: { type: Number, required: true },
-    noCuenta: { type: Number, required: true },
+    noCuenta: { type: String, required: true },
     banco: { type: String, required: true },
     cuenta: {
         type: mongoose.Schema.Types.ObjectId,

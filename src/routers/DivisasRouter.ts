@@ -3,6 +3,11 @@ import { NextFunction, Request, Response, Router } from 'express';
 import DivisasController from '../controllers/DivisasController';
 import Divisa, { IDivisa } from '../models/Divisas/Divisa';
 
+import { checkSchema, validationResult, param } from 'express-validator';
+import CuentasUpdateSchema from '../validators/Cuentas/CuentasUpdateSchema';
+import DivisaSchema from '../validators/Divisas/DivisaSchema';
+import DivisaUpdateSchema from '../validators/Divisas/DivisaUpdateSchema';
+
 class DivisasRouter {
     private _router = Router({ mergeParams: true });
     private _controller = DivisasController;
@@ -29,8 +34,16 @@ class DivisasRouter {
             }
         });
 
-        this._router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+        this._router.post('/', param('id').custom(CuentasUpdateSchema.checkIdCuenta), checkSchema(DivisaSchema.schema), async (req: Request, res: Response, next: NextFunction) => {
             try {
+                const errors = validationResult(req);
+
+                if (!errors.isEmpty()) {
+                    return res.status(400).json({
+                        errors: errors.array()
+                    });
+                }
+
                 const divisa: IDivisa = new Divisa({ ...req.body, cuenta: req.params.id});
                 const resultDivisa = await this._controller.agregarDivisa(divisa);
 
@@ -46,8 +59,20 @@ class DivisasRouter {
             }
         });
 
-        this._router.put('/:idDivisa', async (req: Request, res: Response, next: NextFunction) => {
+        this._router.put('/:idDivisa', 
+                     param('id').custom(CuentasUpdateSchema.checkIdCuenta), 
+                     param('idDivisa').custom(DivisaUpdateSchema.checkIdDivisa), 
+                     checkSchema(DivisaUpdateSchema.schema), 
+                     async (req: Request, res: Response, next: NextFunction) => {
             try {
+                const errors = validationResult(req);
+
+                if (!errors.isEmpty()) {
+                    return res.status(400).json({
+                        errors: errors.array()
+                    });
+                }
+
                 const divisa: IDivisa = new Divisa({ ...req.body });
                 const resultDivisa = await this._controller.actualizarDivisa(req.params.idDivisa, divisa);
 
@@ -63,8 +88,16 @@ class DivisasRouter {
             }
         });
 
-        this._router.delete('/:idDivisa', async (req: Request, res: Response, next: NextFunction) => {
+        this._router.delete('/:idDivisa', param('id').custom(CuentasUpdateSchema.checkIdCuenta), async (req: Request, res: Response, next: NextFunction) => {
             try {
+                const errors = validationResult(req);
+
+                if (!errors.isEmpty()) {
+                    return res.status(400).json({
+                        errors: errors.array()
+                    });
+                }
+
                 const result = await this._controller.eliminarDivisa(req.params.idDivisa);
                 if (!result) {
                     throw new ErrorHandler(500, `Error to delete divisa`);

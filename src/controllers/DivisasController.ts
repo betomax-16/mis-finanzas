@@ -17,6 +17,10 @@ class CuentasController {
         return Divisa.find({ cuenta: mongoose.Types.ObjectId(id) });
     }
 
+    obtenerDivisa(id: string) {
+        return Divisa.findById(id);
+    }
+
     eliminarDivisa(id: string) {
         return Divisa.findByIdAndDelete(id);
     }

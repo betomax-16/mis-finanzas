@@ -34,15 +34,14 @@ class TarjetasController {
     }
 
     obtenerTarjeta(id: string) {
-        const month: number = new Date().getMonth() + 1;
-        const year: number = new Date().getFullYear() % 1000;
+        // const month: number = new Date().getMonth() + 1;
+        // const year: number = new Date().getFullYear() % 1000;
 
         return Tarjeta.aggregate([
             {   
                 $match : { 
                             "_id" : mongoose.Types.ObjectId(id),
-                            "mesVencimiento": { $gte: month }, 
-                            "añoVencimiento": { $gte: year },
+                            "fechaVencimiento": { $gte: new Date() }, 
                             "estado": true
                          }    
             },
@@ -71,8 +70,7 @@ class TarjetasController {
                     "cuenta": "$cuenta",
                     "alias": "$alias",
                     "numero": "$numero",
-                    "mesVencimiento": "$mesVencimiento",
-                    "añoVencimiento": "$añoVencimiento",
+                    "fechaVencimiento": { $dateToString: {format: "%m-%Y", date: "$fechaVencimiento"} },
                     "tipo": "$tipo",
                     "montoLimite": "$extra2.montoLimite",
                     "montoDisponible": "$extra2.montoDisponible",
@@ -80,7 +78,7 @@ class TarjetasController {
                     "peridoDeCorte": "$extra2.peridoDeCorte",
                     "diasExtraDeCorte": "$extra2.diasExtraDeCorte",
                     "interes": "$extra2.interes",
-                    "fechaAperturaMensual": "$extra2.fechaAperturaMensual",
+                    "fechaAperturaMensual": { $dateToString: {format: "%Y-%m-%d", date: "$extra2.fechaAperturaMensual"} },
                     "estado": "$estado",
                 }
             }
@@ -88,15 +86,14 @@ class TarjetasController {
     }
 
     obtenerTarjetas(idCuenta: string) {
-        const month: number = new Date().getMonth() + 1;
-        const year: number = new Date().getFullYear() % 1000;;
+        // const month: number = new Date().getMonth() + 1;
+        // const year: number = new Date().getFullYear() % 1000;;
 
         return Tarjeta.aggregate([
             {   
                 $match : { 
                             "cuenta" : mongoose.Types.ObjectId(idCuenta),
-                            "mesVencimiento": { $gte: month }, 
-                            "añoVencimiento": { $gte: year },
+                            "fechaVencimiento": { $gte: new Date() }, 
                             "estado": true
                          }    
             },
@@ -125,8 +122,7 @@ class TarjetasController {
                     "cuenta": "$cuenta",
                     "alias": "$alias",
                     "numero": "$numero",
-                    "mesVencimiento": "$mesVencimiento",
-                    "añoVencimiento": "$añoVencimiento",
+                    "fechaVencimiento": { $dateToString: {format: "%m-%Y", date: "$fechaVencimiento"} },
                     "tipo": "$tipo",
                     "montoLimite": "$extra2.montoLimite",
                     "montoDisponible": "$extra2.montoDisponible",
@@ -134,7 +130,7 @@ class TarjetasController {
                     "peridoDeCorte": "$extra2.peridoDeCorte",
                     "diasExtraDeCorte": "$extra2.diasExtraDeCorte",
                     "interes": "$extra2.interes",
-                    "fechaAperturaMensual": "$extra2.fechaAperturaMensual",
+                    "fechaAperturaMensual": { $dateToString: {format: "%Y-%m-%d", date: "$extra2.fechaAperturaMensual"} },
                     "estado": "$estado",
                 }
             }

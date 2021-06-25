@@ -32,6 +32,10 @@ class CuentasController {
         }
     }
 
+    activarCuenta(id: string) {
+        return Cuenta.findByIdAndUpdate(id, {estado: true}, {new: true, useFindAndModify: false});
+    }
+
     obtenerCuenta(id: string) {
         return Cuenta.aggregate([
             {   

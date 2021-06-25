@@ -7,6 +7,7 @@ export interface IMovimiento extends Document {
     codigoDivisa: string;
     fecha: Date;
     motivo: string;
+    estado: boolean;
 }
 
 const MovimientoSchema: Schema = new Schema({
@@ -19,6 +20,7 @@ const MovimientoSchema: Schema = new Schema({
     codigoDivisa: { type: String, required: true },
     fecha: { type: Date, required: true, default: Date.now },
     motivo: { type: String, required: true },
+    estado: { type: Boolean, required: true, default: true },
 });
 
 export default mongoose.model<IMovimiento>('Movimientos', MovimientoSchema);

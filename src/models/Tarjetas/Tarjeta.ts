@@ -4,8 +4,7 @@ import { ICuenta } from '../Cuentas/Cuenta';
 export interface ITarjeta extends Document {
     alias: string;
     numero: string;
-    mesVencimiento: number;
-    añoVencimiento: number;
+    fechaVencimiento: Date;
     tipo?: string;
     estado: boolean;
     cuenta: ICuenta['_id'];
@@ -14,8 +13,7 @@ export interface ITarjeta extends Document {
 const TarjetaSchema: Schema = new Schema({
     alias: { type: String, required: true },
     numero: { type: String, required: true, unique: true },
-    mesVencimiento: { type: Number, required: true },
-    añoVencimiento: { type: Number, required: true },
+    fechaVencimiento: { type: Date, required: true },
     tipo: { type: String, required: true },
     estado: { type: Boolean, required: true, default: true },
     cuenta: {

@@ -9,9 +9,13 @@ import Divisa, { IDivisa } from '../models/Divisas/Divisa';
 import DivisasRouter from './DivisasRouter';
 import TarjetasRouter from './TarjetasRouter';
 import MovimientosRouter from './MovimientosRouter';
-import GastosRouter from './GastosRouter';
-import IngresosRouter from './IngresosRouter';
+import MovimientosFijosRouter from './MovimientosFijosRouter';
 import PrestamosRouter from './PrestamosRouter';
+
+import { checkSchema, validationResult, param } from 'express-validator';
+import CuentaSchema from '../validators/Cuentas/CuentaSchema';
+import CuentasUpdateSchema from '../validators/Cuentas/CuentasUpdateSchema';
+
 
 class CuentasRouter {
     private _router = Router();
@@ -19,8 +23,7 @@ class CuentasRouter {
     private _subrouterDivisas = DivisasRouter;
     private _subrouterTarjetas = TarjetasRouter;
     private _subrouterMovimientos = MovimientosRouter;
-    private _subrouterGastos = GastosRouter;
-    private _subrouterIngresos = IngresosRouter;
+    private _subrouterMovimientosFijos = MovimientosFijosRouter;
     private _subrouterPrestamos = PrestamosRouter;
 
     get router() {
@@ -61,8 +64,16 @@ class CuentasRouter {
             }
       });
 
-      this._router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+      this._router.post('/', checkSchema(CuentaSchema), async (req: Request, res: Response, next: NextFunction) => {
           try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    errors: errors.array()
+                });
+            }
+
             const tipo: string = req.body.noCuenta && req.body.banco ? 'bancaria' : 'personal';
             const cuenta: ICuenta = new Cuenta({...req.body, tipo, estado: true });
             const resultCuenta = await this._controller.agregarCuenta(cuenta);
@@ -102,8 +113,16 @@ class CuentasRouter {
           }
       });
 
-      this._router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+      this._router.put('/:id', param('id').custom(CuentasUpdateSchema.checkIdCuenta), checkSchema(CuentasUpdateSchema.schema), async (req: Request, res: Response, next: NextFunction) => {
           try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    errors: errors.array()
+                });
+            }
+
             const cuenta: ICuenta = new Cuenta({...req.body });
             const resultCuenta = await this._controller.actualizarCuenta(req.params.id, cuenta);
 
@@ -146,17 +165,32 @@ class CuentasRouter {
           }
       });
 
+      this._router.put('/:id/activar', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const resultCuenta = await this._controller.activarCuenta(req.params.id);
+
+          if (!resultCuenta) {
+            throw new ErrorHandler(500, `Error to active cuenta`);
+          }
+          else {
+            const result = await this._controller.obtenerCuenta(req.params.id);
+            res.status(200).json(result[0]);
+          }
+        }
+        catch (error) {
+          next(error);
+        }
+    });
+
       this._router.use('/:id/divisas', this._subrouterDivisas);
 
       this._router.use('/:id/tarjetas', this._subrouterTarjetas);
 
       this._router.use('/:id/movimientos', this._subrouterMovimientos);
 
-      this._router.use('/:id/gastos', this._subrouterGastos);
+      this._router.use('/:id/movimientosfijos', this._subrouterMovimientosFijos);
 
-      this._router.use('/:id/ingresos', this._subrouterIngresos);
-
-      this._router.use('/:id/prestamos', this._subrouterPrestamos);
+      // this._router.use('/:id/prestamos', this._subrouterPrestamos);
     }
 }
 
