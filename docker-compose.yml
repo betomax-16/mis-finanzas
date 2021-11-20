@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  app:
+    image: node:12-alpine
+    command: sh -c "npm install && yarn run dev"
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./:/app
+  mongo:
+    image: mongo:latest
+      ports:
+          - "27017:27017"
+    container_name: db
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
